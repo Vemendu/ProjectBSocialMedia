@@ -7,6 +7,7 @@ import com.example.ProjectB.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +22,18 @@ public class ClientController {
         this.clientService = clientService;
     }
 
+    @GetMapping("/register")
+    public String showRegistrationForm(Model model) {
+        model.addAttribute("user", new Client());
+
+        return "signup_form";
+    }
+
+    @GetMapping("")
+    public String viewHomePage()
+    {
+        return "index";
+    }
     @PostMapping("/create") public ResponseEntity create(@RequestBody ClientRequest clientRequest) {
         boolean result = clientService.saveClient(clientRequest);
         if (result) {
@@ -32,36 +45,24 @@ public class ClientController {
     @PostMapping("/sign-in") public ResponseEntity signIn(@RequestBody ClientRequest clientRequest) {
         Client client = clientService.getClientByUsername(clientRequest.getUsername());
         if (client != null && client.getPassword().equals(clientRequest.getPassword())) {
-            for(String token : clientService.getTokens())
-            {
-                clientService.addBlacklistedToken(token);
-            }
-            String token = TokenHelper.getToken(clientRequest.getUsername());
-            if(clientService.addToken(token))
-                return new ResponseEntity(token, HttpStatus.OK);
+                return new ResponseEntity(HttpStatus.OK);
         }
         return ResponseEntity.badRequest().body("Account doesn't exist");
     }
 
     @PostMapping("/log-out") public ResponseEntity logOut(HttpServletRequest request) {
-        boolean result = clientService.addBlacklistedToken(request.getHeader("token"));
-        if(result)
+        if(true)
             return new ResponseEntity("Logged  successfully", HttpStatus.OK);
         return ResponseEntity.badRequest().body("Bad request or account doesn't exist");
     }
 
     @GetMapping("/get") public ResponseEntity check(HttpServletRequest request) {
-        String token = request.getHeader("token");
-        for(String bToken : clientService.getBlacklistedTokens())
-        {
-            if(token.equals(bToken))
-                return ResponseEntity.badRequest().body("Token expired");
-        }
-        String username = TokenHelper.getUsernameByToken(token);
+        /*String username = TokenHelper.getUsernameByToken(token);
         if (clientService.getClientByUsername(username)!=null) {
             Client client = clientService.getClientByUsername(username);
             return ResponseEntity.ok(client);
         }
+        return ResponseEntity.badRequest().body("Invalid token");*/
         return ResponseEntity.badRequest().body("Invalid token");
     }
 
