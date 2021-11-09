@@ -6,8 +6,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 
 @Entity
@@ -17,7 +19,7 @@ import java.util.List;
 public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    private Long id;
     private String username;
     private String password;
     private String email;
@@ -25,11 +27,27 @@ public class Client {
     private String address;
     private String phoneNumber;
     private String accountBalance;
+    @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "clients_roles",
+            joinColumns = @JoinColumn(name = "client_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+
+    )
+    private Set<Role> rolesSet = new HashSet<>();
     @OneToMany
     private List<CreditCard> creditCards;
 
     public Client() {
 
+    }
+
+    public Set<Role> getRolesSet() {
+        return rolesSet;
+    }
+
+    public void setRolesSet(Set<Role> rolesSet) {
+        this.rolesSet = rolesSet;
     }
 
     public Client(String username) {
@@ -43,9 +61,13 @@ public class Client {
         setEmail(clientRequest.getEmail());
         setPhoneNumber(clientRequest.getPhoneNumber());
         setPassword(clientRequest.getPassword());
-        setId(clientRequest.getId());
         setUsername(clientRequest.getUsername());
         setAccountBalance(clientRequest.getAccountBalance());
+    }
+
+    public void addRole(Role role)
+    {
+        this.rolesSet.add(role);
     }
     /*
     public String getPassword() {

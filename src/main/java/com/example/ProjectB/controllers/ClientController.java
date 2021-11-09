@@ -1,20 +1,28 @@
 package com.example.ProjectB.controllers;
 
 import com.example.ProjectB.Entities.Client;
+import com.example.ProjectB.Entities.Role;
+import com.example.ProjectB.helpers.ClientDetails;
 import com.example.ProjectB.helpers.TokenHelper;
 import com.example.ProjectB.models.ClientRequest;
+import com.example.ProjectB.repositories.ClientRepository;
 import com.example.ProjectB.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
-@RestController
-@RequestMapping("/account")
+@Controller
 public class ClientController {
+    @Autowired
     private ClientService clientService;
 
     @Autowired
@@ -24,9 +32,83 @@ public class ClientController {
 
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
-        model.addAttribute("user", new Client());
+        model.addAttribute("client", new Client());
 
         return "signup_form";
+    }
+
+    @GetMapping("/register_admin")
+    public String showAdminRegistrationForm(Model model) {
+        model.addAttribute("client", new Client());
+
+        return "admin_signup_form";
+    }
+
+    @PostMapping("/process_register")
+    public String processRegistration(ClientRequest clientRequest)
+    {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode(clientRequest.getPassword());
+        clientRequest.setPassword(encodedPassword);
+
+        boolean result = clientService.saveClient(clientRequest);
+        if (result)
+            return "successRegistration";
+        return "failedRegistration";
+    }
+
+    @PostMapping("/process_register_admin")
+    public String processRegistrationAdmin(ClientRequest clientRequest)
+    {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode(clientRequest.getPassword());
+        clientRequest.setPassword(encodedPassword);
+
+        boolean result = clientService.saveAdmin(clientRequest);
+        if (result)
+            return "successRegistration";
+        return "failedRegistration";
+    }
+
+    @GetMapping("/update")
+    public String showUpdateUserInfoForm(Model model) {
+        model.addAttribute("client", new Client());
+        return "update_form";
+    }
+
+    @GetMapping("/delete_process")
+    public String deleteProcess()
+    {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username;
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails)principal).getUsername();
+        } else {
+            username = principal.toString();
+        }
+        for(Role role : clientService.findByUsername(username).getRolesSet())
+        {
+            if(role.getName().equals("USER"))
+                return "failedDelete";
+        }
+        boolean result = clientService.deleteClient(username);
+        if(result)
+            return "successDelete";
+        return "failedDelete";
+    }
+
+
+    @PostMapping("/process_update")
+    public String processUpdate(Client client)
+    {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode(client.getPassword());
+        client.setPassword(encodedPassword);
+            boolean result = clientService.updateClient(client);
+            if(result)
+                return "successUpdate";
+            else
+                return "failedUpdate";
     }
 
     @GetMapping("")
@@ -34,68 +116,18 @@ public class ClientController {
     {
         return "index";
     }
-    @PostMapping("/create") public ResponseEntity create(@RequestBody ClientRequest clientRequest) {
-        boolean result = clientService.saveClient(clientRequest);
-        if (result) {
-            return new ResponseEntity("Client created", HttpStatus.CREATED);
-        }
-        return ResponseEntity.badRequest().body("Creation failed");
+
+    @GetMapping("/clients")
+    public String listClients(Model model) {
+        List<Client> listClients = (List<Client>) clientService.findAll();
+        model.addAttribute("listClients", listClients);
+        return "clients";
     }
 
-    @PostMapping("/sign-in") public ResponseEntity signIn(@RequestBody ClientRequest clientRequest) {
-        Client client = clientService.getClientByUsername(clientRequest.getUsername());
-        if (client != null && client.getPassword().equals(clientRequest.getPassword())) {
-                return new ResponseEntity(HttpStatus.OK);
-        }
-        return ResponseEntity.badRequest().body("Account doesn't exist");
-    }
 
-    @PostMapping("/log-out") public ResponseEntity logOut(HttpServletRequest request) {
-        if(true)
-            return new ResponseEntity("Logged  successfully", HttpStatus.OK);
-        return ResponseEntity.badRequest().body("Bad request or account doesn't exist");
-    }
 
-    @GetMapping("/get") public ResponseEntity check(HttpServletRequest request) {
-        /*String username = TokenHelper.getUsernameByToken(token);
-        if (clientService.getClientByUsername(username)!=null) {
-            Client client = clientService.getClientByUsername(username);
-            return ResponseEntity.ok(client);
-        }
-        return ResponseEntity.badRequest().body("Invalid token");*/
-        return ResponseEntity.badRequest().body("Invalid token");
-    }
 
-    @PostMapping("/update") public ResponseEntity update(@RequestBody ClientRequest clientRequest, HttpServletRequest request) {
-        String token = request.getHeader("token");
-        for(String bToken : clientService.getBlacklistedTokens())
-        {
-            if(token.equals(bToken))
-                return ResponseEntity.badRequest().body("Token expired");
-        }
-        String username = TokenHelper.getUsernameByToken(token);
-        boolean result = clientService.editClient(clientRequest);
-        if (result) {
-            return new ResponseEntity("Account updated", HttpStatus.OK);
-        }
-        return ResponseEntity.badRequest().body("Bad request upon updating");
-    }
 
-    @PostMapping("/delete") public ResponseEntity delete(HttpServletRequest request) {
-        String token = request.getHeader("token");
-        for(String bToken : clientService.getBlacklistedTokens())
-        {
-            if(token.equals(bToken))
-                return ResponseEntity.badRequest().body("Token has already expired");
-        }
-        String username = TokenHelper.getUsernameByToken(token);
-        boolean result1 = clientService.deleteClient(username);
-        boolean result2 = clientService.addBlacklistedToken(request.getHeader("token"));
-        if (result1 && result2) {
-            return new ResponseEntity("Account deleted successfully", HttpStatus.OK);
-        }
-        return ResponseEntity.badRequest().body("Bad request upon deletion \n" +
-                "Your token has already expired or your account is already deleted.");
 
-    }
+
 }

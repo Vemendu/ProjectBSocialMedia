@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Deletion Successful!</title>
+</head>
+<body>
+    <form th:action="@{/logout}" method="post">
+        <p>
+            Deletion successful! Now you need to Log Out.
+        </p>
+        <input type="submit" value="Sign Out" />
+    </form>
+</body>
+</html>

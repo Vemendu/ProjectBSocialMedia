@@ -1,14 +1,18 @@
 package com.example.ProjectB.services;
 
 import com.example.ProjectB.Entities.Client;
+import com.example.ProjectB.Entities.Role;
+import com.example.ProjectB.helpers.ClientDetails;
 import com.example.ProjectB.models.ClientRequest;
 import com.example.ProjectB.repositories.ClientRepository;
+import com.example.ProjectB.repositories.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,69 +20,108 @@ import java.util.List;
 public class ClientService implements UserDetailsService {
     @Autowired
     private ClientRepository clientRepository;
-
-    private List<String> blacklistedTokens = new LinkedList<>();
-    private List<String> tokens = new LinkedList<>();
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public ClientDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Client client = clientRepository.findByUsername(username);
         if(client == null)
         {
-            return null;
+            throw new UsernameNotFoundException("User not found");
         }
         else{
-            return (UserDetails) client;
+            return new ClientDetails(client);
         }
     }
 
+    public Client findByUsername(String username) throws UsernameNotFoundException {
+        Client client = clientRepository.findByUsername(username);
+        if(client == null)
+        {
+            throw new UsernameNotFoundException("User not found");
+        }
+        else{
+            return client;
+        }
+    }
+
+    public Iterable<Client> findAll()
+    {
+        return clientRepository.findAll();
+    }
+
+
     public boolean saveClient(ClientRequest clientRequest) {
+        Client client = new Client(clientRequest);
+        boolean checker = true;
+        Role roleclient;
+        try{roleRepository.findByName("USER");}
+        catch (NullPointerException e)
+        {
+            checker=false;
+        }
+        roleclient = find("USER");
+        if(roleclient==null)
+        {
+            roleclient = new Role("USER");
+            roleRepository.save(roleclient);
+        }
 
-        Client byUsername = clientRepository.findByUsername(clientRequest.getUsername());
-        if(byUsername!=null)
+        client.addRole(roleclient);
+        clientRepository.save(client);
+        return true;
+    }
+
+    public boolean saveAdmin(ClientRequest clientRequest) {
+        Client client = new Client(clientRequest);
+        boolean checker = true;
+        Role roleclient;
+        try{roleRepository.findByName("ADMIN");}
+        catch (NullPointerException e)
+        {
+            checker=false;
+        }
+        roleclient = find("ADMIN");
+        if(roleclient==null)
+        {
+            roleclient = new Role("ADMIN");
+            roleRepository.save(roleclient);
+        }
+
+        client.addRole(roleclient);
+        clientRepository.save(client);
+        return true;
+    }
+
+    public Role find(String name)
+    {
+
+        try{ roleRepository.findByName("USER");
+            return roleRepository.findByName("USER");}
+        catch (NullPointerException e) {
+            return null;
+        }
+
+    }
+    //@Transactional
+    public boolean updateClient(Client client)
+    {
+        Client client1 = clientRepository.findByUsername(client.getUsername());
+        if(client1==null)
             return false;
-
-        Client client = new Client(clientRequest);
-        clientRepository.save(client);
+        client1.setAge(client.getAge());
+        client1.setAddress(client.getAddress());
+        client1.setEmail(client.getEmail());
+        client1.setPhoneNumber(client.getPhoneNumber());
+        clientRepository.save(client1);
         return true;
     }
 
-    public boolean editClient(ClientRequest clientRequest) {
-        int id = clientRepository.findByUsername(clientRequest.getUsername()).getId();
-        clientRepository.delete(clientRepository.findByUsername(clientRequest.getUsername()));
-        Client client = new Client(clientRequest);
-        client.setId(id);
-        clientRepository.save(client);
-        return true;
-    }
-
-    public boolean deleteClient(String username) {
-        clientRepository.delete(clientRepository.findByUsername(username));
-        return true;
-    }
-
-    public Client getClientByUsername(String username) {
-        Client byUsername = clientRepository.findByUsername(username);
-        return byUsername;
-    }
-
-    public List<String> getBlacklistedTokens() {
-        return blacklistedTokens;
-    }
-
-    public boolean addBlacklistedToken(String token)
+    public boolean deleteClient(String username)
     {
-        blacklistedTokens.add(token);
-        return true;
-    }
-
-    public List<String> getTokens() {
-        return tokens;
-    }
-
-    public boolean addToken(String token)
-    {
-        tokens.add(token);
+        Client client1 = clientRepository.findByUsername(username);
+        clientRepository.deleteById(client1.getId());
         return true;
     }
 
