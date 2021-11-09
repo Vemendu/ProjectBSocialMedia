@@ -14,7 +14,7 @@
         <form th:action="@{/logout}" method="post">
             <p>
                 Welcome <b>[[${#request.userPrincipal.principal.username}]]</b>
-                <span sec:authentification="principal.authorities">Roles</span>
+                <span sec:authentification="principal.authorities"></span>
             </p>
             <input type="submit" value="Sign Out" />
         </form>

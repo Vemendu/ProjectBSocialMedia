@@ -2,14 +2,9 @@ package com.example.ProjectB.controllers;
 
 import com.example.ProjectB.Entities.Client;
 import com.example.ProjectB.Entities.Role;
-import com.example.ProjectB.helpers.ClientDetails;
-import com.example.ProjectB.helpers.TokenHelper;
 import com.example.ProjectB.models.ClientRequest;
-import com.example.ProjectB.repositories.ClientRepository;
 import com.example.ProjectB.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,7 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller

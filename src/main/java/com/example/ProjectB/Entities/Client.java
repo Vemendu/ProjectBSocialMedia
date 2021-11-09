@@ -35,8 +35,6 @@ public class Client {
 
     )
     private Set<Role> rolesSet = new HashSet<>();
-    @OneToMany
-    private List<CreditCard> creditCards;
 
     public Client() {
 
