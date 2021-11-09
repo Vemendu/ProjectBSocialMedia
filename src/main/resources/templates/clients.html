@@ -14,7 +14,7 @@
         <form th:action="@{/logout}" method="post">
             <p>
                 Welcome <b>[[${#request.userPrincipal.principal.username}]]</b>
-                <span sec:authentification="principal.authorities"></span>
+                <span sec:authentification="principal.authorities">.</span>
             </p>
             <input type="submit" value="Sign Out" />
         </form>
@@ -33,6 +33,7 @@
                 <th>Age</th>
                 <th>Address</th>
                 <th>Phone Number</th>
+                <th>Account Balance</th>
                 <th>Role</th>
             </tr>
             </thead>
@@ -44,6 +45,7 @@
                 <td th:text="${client.age}">Age</td>
                 <td th:text="${client.address}">Age</td>
                 <td th:text="${client.phoneNumber}">Phone number</td>
+                <td th:text="${client.accountBalance}">Account Balance</td>
                 <td th:text="${client.rolesSet}">Role</td>
             </tr>
             </tbody>

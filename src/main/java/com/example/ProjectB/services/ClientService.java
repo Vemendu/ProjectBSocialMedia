@@ -97,8 +97,8 @@ public class ClientService implements UserDetailsService {
     public Role find(String name)
     {
 
-        try{ roleRepository.findByName("USER");
-            return roleRepository.findByName("USER");}
+        try{ roleRepository.findByName(name);
+            return roleRepository.findByName(name);}
         catch (NullPointerException e) {
             return null;
         }
@@ -106,6 +106,19 @@ public class ClientService implements UserDetailsService {
     }
     //@Transactional
     public boolean updateClient(Client client)
+    {
+        Client client1 = clientRepository.findByUsername(client.getUsername());
+        if(client1==null || client1.getPassword().equals(client.getPassword()))
+            return false;
+        client1.setAge(client.getAge());
+        client1.setAddress(client.getAddress());
+        client1.setEmail(client.getEmail());
+        client1.setPhoneNumber(client.getPhoneNumber());
+        clientRepository.save(client1);
+        return true;
+    }
+
+    public boolean updateClientByAdmin(Client client)
     {
         Client client1 = clientRepository.findByUsername(client.getUsername());
         if(client1==null)

@@ -27,6 +27,7 @@ public class Client {
     private String address;
     private String phoneNumber;
     private String accountBalance;
+
     @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     @JoinTable(
             name = "clients_roles",

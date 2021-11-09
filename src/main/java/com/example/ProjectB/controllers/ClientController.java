@@ -70,6 +70,34 @@ public class ClientController {
         return "update_form";
     }
 
+    @GetMapping("/update_admin")
+    public String showUpdateOtherUserInfoForm(Model model) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username;
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails)principal).getUsername();
+        } else {
+            username = principal.toString();
+        }
+        for(Role role : clientService.findByUsername(username).getRolesSet())
+        {
+            if(role.getName().equals("USER"))
+                return "failedUpdate";
+        }
+        model.addAttribute("client", new Client());
+        return "admin_update_form";
+    }
+
+    @PostMapping("/admin_process_update")
+    public String processAdminUpdate(Client client)
+    {
+        boolean result = clientService.updateClientByAdmin(client);
+        if(result)
+            return "successUpdate";
+        else
+            return "failedUpdate";
+    }
+
     @GetMapping("/delete_process")
     public String deleteProcess()
     {
