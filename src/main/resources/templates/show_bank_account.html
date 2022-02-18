@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div>
+    <h1>Your account balance</h1>
+</div>
+
+<div>
+    <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
+        <tr>
+            <th>Username</th>
+            <th>Account Balance</th>
+            <th>Role</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:object="${client}">
+            <td th:text="${client.username}">Username</td>
+            <td th:text="${client.accountBalance}">Account Balance</td>
+            <td th:text="${client.rolesSet}">Role</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div>
+        <h1>Return to <a th:href="@{/}">Home Page</a></h1>
+    </div>
+</div>
+
+</body>
+</html>

@@ -33,10 +33,15 @@ public class Client {
             name = "clients_roles",
             joinColumns = @JoinColumn(name = "client_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
-
     )
     private Set<Role> rolesSet = new HashSet<>();
-
+    @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "friends",
+            joinColumns = @JoinColumn(name = "friend_1"),
+            inverseJoinColumns = @JoinColumn(name = "friend_2")
+    )
+    private Set<Client> friends = new HashSet<>();
     public Client() {
 
     }

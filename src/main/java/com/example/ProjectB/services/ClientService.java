@@ -53,14 +53,18 @@ public class ClientService implements UserDetailsService {
 
 
     public boolean saveClient(ClientRequest clientRequest) {
+        if(findUsername(clientRequest.getUsername()))
+            return false;
         Client client = new Client(clientRequest);
-        boolean checker = true;
         Role roleclient;
+        /*boolean checker = true;
+
         try{roleRepository.findByName("USER");}
         catch (NullPointerException e)
         {
             checker=false;
-        }
+        };*/
+
         roleclient = find("USER");
         if(roleclient==null)
         {
@@ -74,6 +78,8 @@ public class ClientService implements UserDetailsService {
     }
 
     public boolean saveAdmin(ClientRequest clientRequest) {
+        if(findUsername(clientRequest.getUsername()))
+            return false;
         Client client = new Client(clientRequest);
         boolean checker = true;
         Role roleclient;
@@ -104,6 +110,32 @@ public class ClientService implements UserDetailsService {
         }
 
     }
+
+    public boolean findUsername(String name)
+    {
+        try{clientRepository.findByUsername(name);
+            if (clientRepository.findByUsername(name)==null)
+                return false;
+            return true;}
+        catch (NullPointerException e)
+        {
+            return false;
+        }
+
+    }
+
+    public Client getByUsername(String name)
+    {
+        try{clientRepository.findByUsername(name);
+            if (clientRepository.findByUsername(name)==null)
+                return null;
+            return clientRepository.findByUsername(name);}
+        catch (NullPointerException e)
+        {
+            return null;
+        }
+
+    }
     //@Transactional
     public boolean updateClient(Client client)
     {
@@ -114,6 +146,14 @@ public class ClientService implements UserDetailsService {
         client1.setAddress(client.getAddress());
         client1.setEmail(client.getEmail());
         client1.setPhoneNumber(client.getPhoneNumber());
+        clientRepository.save(client1);
+        return true;
+    }
+
+    public boolean updateClientBalance(Client client)
+    {
+        Client client1 = clientRepository.findByUsername(client.getUsername());
+        client1.setAccountBalance(client1.getAccountBalance());
         clientRepository.save(client1);
         return true;
     }

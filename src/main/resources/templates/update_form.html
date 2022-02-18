@@ -2,7 +2,7 @@
         <html xmlns:th="http://www.thymeleaf.org">
         <head>
         <meta charset="UTF-8">
-        <title>Update client's info - ABC</title>
+        <title>Update user's info</title>
     <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/css/bootstrap.min.css" />
     <script type="text/javascript" src="/webjars/jquery/jquery.min.js"></script>
     <script type="text/javascript" src="/webjars/bootstrap/js/bootstrap.min.js"></script>
@@ -10,7 +10,7 @@
 <body>
 <div class="container text-center">
     <div>
-        <h1>Client Update info</h1>
+        <h1>User Update info</h1>
     </div>
 
     <form th:action="@{/process_update}" th:object="${client}"
@@ -63,9 +63,6 @@
                 <button type="submit" class="btn btn-primary">Update</button>
             </div>
         </div>
-    </form>
-
-
     </form>
 </div>
 </body>

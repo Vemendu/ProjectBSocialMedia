@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile</title>
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/css/bootstrap.min.css" />
+    <script type="text/javascript" src="/webjars/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/webjars/bootstrap/js/bootstrap.min.js"></script>
+</head>
+<body>
+<img src="profile_pic.jpg" alt="Profile pic" width="500" height="600">
+<form th:action="@{/process_update}" th:object="${client}"
+      method="post" style="max-width: 600px; margin: 0 auto;">
+    <div class="m-3">
+        <div class="form-group row">
+            <label class="col-4 col-form-label">Write you current Username: </label>
+            <div class="col-8">
+                <input type="text" th:field="*{username}" class="form-control" required />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-4 col-form-label">Write your current password: </label>
+            <div class="col-8">
+                <input type="password" th:field="*{password}" class="form-control" required />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-4 col-form-label">Age: </label>
+            <div class="col-8">
+                <input type="text" th:field="*{age}" class="form-control" required />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-4 col-form-label">Address: </label>
+            <div class="col-8">
+                <input type="text" th:field="*{address}" class="form-control"
+                       required minlength="6" maxlength="10"/>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-4 col-form-label">Email: </label>
+            <div class="col-8">
+                <input type="email" th:field="*{email}" class="form-control"
+                       required minlength="2" maxlength="20"/>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-4 col-form-label">Phone number: </label>
+            <div class="col-8">
+                <input type="tel" th:field="*{phoneNumber}" class="form-control"
+                       required minlength="2" maxlength="20" />
+            </div>
+        </div>
+
+        <div>
+            <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+    </div>
+</form>
+</body>
+</html>

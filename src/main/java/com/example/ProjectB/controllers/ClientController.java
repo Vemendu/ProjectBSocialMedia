@@ -38,6 +38,25 @@ public class ClientController {
         return "admin_signup_form";
     }
 
+    @GetMapping("/visit_profile_page")
+    public String visitProfilePage(Model model) {
+        model.addAttribute("client", new Client());
+
+        return "profile";
+    }
+
+    @GetMapping("/add_friend")
+    public String addFriend(Model model)
+    {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof UserDetails) {
+            String username = ((UserDetails) principal).getUsername();
+        } else {
+        } String username = principal.toString();
+        return "profile";
+    }
+
     @PostMapping("/process_register")
     public String processRegistration(ClientRequest clientRequest)
     {
@@ -144,11 +163,56 @@ public class ClientController {
         List<Client> listClients = (List<Client>) clientService.findAll();
         model.addAttribute("listClients", listClients);
         return "clients";
+
     }
 
-
-
-
+//    @GetMapping("/view_finances")
+//    public String viewFinances(Model model)
+//    {
+//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        String username;
+//        if (principal instanceof UserDetails) {
+//            username = ((UserDetails)principal).getUsername();
+//        } else {
+//            username = principal.toString();
+//        }
+//        Client client = clientService.getByUsername(username);
+//        model.addAttribute("client",client);
+//        String balance = client.getAccountBalance();
+//        if(balance==null)
+//            return "no_bank_account";
+//        return "show_bank_account";
+//    }
+//
+//    @GetMapping("/add_finances")
+//    public String addFinances(Model model) {
+//        model.addAttribute("client", new Client());
+//        return "account_balance_form";
+//    }
+//
+//    @PostMapping("/add_finances_process")
+//    public String addFinancesProcess(Client client)
+//    {
+//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        String username;
+//        if (principal instanceof UserDetails) {
+//            username = ((UserDetails)principal).getUsername();
+//        } else {
+//            username = principal.toString();
+//        }
+//        Client client2 = clientService.getByUsername(username);
+//        try{
+//            client2.setAccountBalance(Integer.toString(Integer.parseInt(client2.getAccountBalance())+Integer.parseInt(client.getAccountBalance())));
+//        }
+//        catch (Exception e)
+//        {
+//            int save = Integer.parseInt(client.getAccountBalance());
+//            String save2 = Integer.toString(save);
+//            client2.setAccountBalance(save2);
+//        }
+//        clientService.updateClientBalance(client2);
+//        return "show_bank_account";
+//    }
 
 
 

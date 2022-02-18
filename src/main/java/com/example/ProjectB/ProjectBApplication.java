@@ -12,6 +12,7 @@ public class ProjectBApplication {
 	public static void main(String[] args)
 	{
 		SpringApplication.run(ProjectBApplication.class, args);
+		main.WebSocketServer.runServer();
 	}
 
 }
